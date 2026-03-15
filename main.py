@@ -1,20 +1,19 @@
 import pygame
-
-# ลดปัญหาเสียงแครกโดยใช้บัฟเฟอร์ใหญ่ขึ้นและสเตอริโอ
-pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=2048)
-
 from config import WIDTH, HEIGHT, FPS
 from scenes.game_scene import GameScene
+from scenes.start_menu import StartMenu
 
 
 def main():
+    # เตรียมมิกเซอร์ให้รองรับเสียงสังเคราะห์และไฟล์เสียง
+    pygame.mixer.pre_init(frequency=44100, size=-16, channels=1, buffer=512)
     pygame.init()
-    # ลดภาระเรนเดอร์เพื่อไม่ให้เสียงขาด: โหมดมาตรฐาน ไม่ใช้ scaling
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    flags = pygame.HWSURFACE | pygame.DOUBLEBUF
+    screen = pygame.display.set_mode((WIDTH, HEIGHT), flags)
     pygame.display.set_caption("Galaxy Shooter")
 
     clock = pygame.time.Clock()
-    game = GameScene()
+    scene = StartMenu()
 
     running = True
     while running:
@@ -23,14 +22,17 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            game.handle_events(event)
+            scene.handle_events(event)
 
-        game.update()
-        game.draw(screen)
+        # เปลี่ยนจากเมนูไปเกมเมื่อกด start
+        if isinstance(scene, StartMenu) and scene.done:
+            scene = GameScene()
+
+        scene.update()
+        scene.draw(screen)
 
         pygame.display.flip()
 
-    pygame.mixer.quit()
     pygame.quit()
 
 

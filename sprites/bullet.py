@@ -1,21 +1,22 @@
 import pygame
-from config import HEIGHT
-from sprites.base import SpaceObject
+from config import HEIGHT, BULLET_SIZE, BULLET_COLOR, BULLET_SPEED
 
 
-class Bullet(SpaceObject):
-    """Simple upward bullet. Inherits SpaceObject to demonstrate inheritance."""
+class Bullet(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
 
-    def __init__(self, x: int, y: int):
-        image = pygame.Surface((5, 15))
-        image.fill((255, 255, 0))
-        super().__init__(image)
+        self.image = pygame.Surface(BULLET_SIZE)
+        self.image.fill(BULLET_COLOR)
+
+        self.rect = self.image.get_rect()
         self.rect.centerx = x
         self.rect.bottom = y
-        self._speed_y = -10  # Encapsulated speed for clarity
+
+        self.speed = BULLET_SPEED
 
     def update(self):
-        self.rect.y += self._speed_y
+        self.rect.y += self.speed
 
         # ถ้าหลุดจอบน ให้ลบตัวเอง
         if self.rect.bottom < 0:
